@@ -39,11 +39,20 @@ function App() {
         ></textarea>
       </div>
       <button
-        type="submit"
         className="Form__Button mt-4"
-        onClick={() => setSubmit(true)}
+        onClick={(e) => {
+          e.preventDefault();
+          setSubmit(true);
+        }}
       >
-        {Submit ? <UseAnimations animation={loading} /> : "Submit"}
+        {Submit ? (
+          <UseAnimations
+            animation={loading}
+            wrapperStyle={{ color: "white" }}
+          />
+        ) : (
+          "Submit"
+        )}
       </button>
     </form>
   );

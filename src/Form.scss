@@ -1,0 +1,27 @@
+.form{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    input, textarea{
+        width: 32rem;
+    }
+}
+.Form__Button{
+    width: 32rem;
+    background-image: linear-gradient(to bottom right, #9d50bb , #6e48aa);;
+    color: white;
+    border: none;
+    border-radius: 0.4rem;
+    padding: 0.7rem;
+    text-align: center;
+    font-weight: Bold;
+}
+.form-control{
+    &:focus{
+        border-color: #6e48aa !important;
+        box-shadow: none !important;
+    }
+}

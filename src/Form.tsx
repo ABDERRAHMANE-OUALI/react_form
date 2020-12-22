@@ -1,37 +1,56 @@
 import React, { useState } from "react";
 import UseAnimations from "react-useanimations";
-import loading from "react-useanimations/lib/loading";
-import alertTriangle from "react-useanimations/lib/alertTriangle";
+import alertTriangle from "react-useanimations/lib/alertCircle";
 import Joi from "joi";
 import "./Form.css";
 
+interface InputValidation {
+  [key: string]: string;
+}
+
 function App() {
-  const [Submit, setSubmit] = useState<boolean>(false);
-  const [error, setError] = useState<Joi.ValidationErrorItem[] | null>(null);
+  const [userError, setUserError] = useState<string | undefined>("");
+  const [emailError, setEmailError] = useState<string | undefined>("");
+  const [messageError, setMsgError] = useState<string | undefined>("");
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
-  const shema = Joi.object({
-    username: Joi.string().required().label("Username"),
+  const usernameShema = Joi.object({
+    username: Joi.string()
+      .required()
+      .label("Username is not allowed to be empty"),
+  });
+  const emailShema = Joi.object({
     email: Joi.string()
       .email({ tlds: { allow: false } })
       .required()
-      .label("Email"),
-    message: Joi.string().required().label("Message"),
+      .label("Email is not allowed to be empty"),
+  });
+  const messageShema = Joi.object({
+    message: Joi.string()
+      .required()
+      .label("Message is not allowed to be empty"),
   });
   function resetValidation() {
-    setError(null);
+    setEmailError(undefined);
+    setMsgError(undefined);
+    setUserError(undefined);
   }
-  function validationInputs() {
-    const result = shema.validate(
-      {
-        username: username,
-        email: email,
-        message: message,
-      },
-      { abortEarly: false }
-    );
-    result.error && setError(result.error.details);
+  function validationInput(
+    inputLabel: string,
+    inputData: string,
+    updateMethod: React.Dispatch<React.SetStateAction<string | undefined>>,
+    shema: Joi.ObjectSchema<any>
+  ) {
+    const object: InputValidation = {};
+    object[inputLabel] = inputData;
+    const result = shema.validate(object, { abortEarly: false });
+    result.error && updateMethod(result?.error?.details[0]?.context?.label);
+  }
+  function validation() {
+    validationInput("username", username, setUserError, usernameShema);
+    validationInput("email", email, setEmailError, emailShema);
+    validationInput("message", message, setMsgError, messageShema);
   }
   return (
     <form className="form mb-3 mt-3 ml-3 mr-3">
@@ -40,18 +59,22 @@ function App() {
           Username
         </label>
         <input
-          type="email"
-          className="form-control"
+          type="text"
+          className={`form-control ${userError && "inputError"}`}
           id="exampleInputEmail1"
           aria-describedby="emailHelp"
           onClick={() => resetValidation()}
           onChange={(e) => setUsername(e.currentTarget.value)}
         />
-        {(error && error[0]?.message) && (
-          <p className="error">
-            <UseAnimations animation={alertTriangle} color="red" />{" "}
-            {error[0]?.message}{" "}
-          </p>
+        {userError && (
+          <div className="error">
+            <UseAnimations
+              size={32}
+              animation={alertTriangle}
+              strokeColor="red"
+            />{" "}
+            {userError}{" "}
+          </div>
         )}
       </div>
       <div className="mb-3 mt-4">
@@ -59,16 +82,21 @@ function App() {
           Email address
         </label>
         <input
-          type="email"
-          className="form-control"
+          type="text"
+          className={`form-control ${emailError && "inputError"}`}
           id="exampleInputPassword1"
           onChange={(e) => setEmail(e.currentTarget.value)}
           onClick={() => resetValidation()}
         />
-        {error && error[1]?.message && (
-          <p className="error">
-            <UseAnimations animation={alertTriangle} /> {error[1].message}{" "}
-          </p>
+        {emailError && (
+          <div className="error">
+            <UseAnimations
+              size={32}
+              strokeColor="red"
+              animation={alertTriangle}
+            />{" "}
+            {emailError}{" "}
+          </div>
         )}
       </div>
       <div className="mb-3 mt-4">
@@ -76,35 +104,31 @@ function App() {
           Message
         </label>
         <textarea
-          className="form-control"
+          className={`form-control ${messageError && "inputError"}`}
           id="exampleFormControlTextarea1"
           rows={3}
           onClick={() => resetValidation()}
           onChange={(e) => setMessage(e.currentTarget.value)}
         ></textarea>
-        {error && error[2]?.message && (
-          <p className="error">
-            <UseAnimations animation={alertTriangle} /> {error[2].message}{" "}
-          </p>
+        {messageError && (
+          <div className="error">
+            <UseAnimations
+              size={32}
+              strokeColor="red"
+              animation={alertTriangle}
+            />{" "}
+            {messageError}{" "}
+          </div>
         )}
       </div>
       <button
         className="Form__Button mt-4"
         onClick={(e) => {
           e.preventDefault();
-          setSubmit(true);
-          validationInputs();
-          setSubmit(false);
+          validation();
         }}
       >
-        {Submit ? (
-          <UseAnimations
-            animation={loading}
-            wrapperStyle={{ color: "white" }}
-          />
-        ) : (
           "Submit"
-        )}
       </button>
     </form>
   );

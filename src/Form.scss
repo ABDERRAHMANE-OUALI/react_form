@@ -28,3 +28,16 @@
         box-shadow: none !important;
     }
 }
+img{
+    background-color: transparent;   
+}
+.error{
+    color: red;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.inputError{
+    border-color: red !important;
+}
